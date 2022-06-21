@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "name": "WidevineCdm",
+  "description": "Widevine Content Decryption Module",
+  "version": "4.10.1503.4",
+  "minimum_chrome_version": "68.0.3430.0",
+  "x-cdm-module-versions": "4",
+  "x-cdm-interface-versions": "10",
+  "x-cdm-host-versions": "10",
+  "x-cdm-codecs": "vp8,vp9.0,avc1",
+  "x-cdm-persistent-license-support": true,
+  "x-cdm-supported-encryption-schemes": ["cenc","cbcs"],
+  "os": "win",
+  "arch": "ia32",
+  "author": "admenri"
+}

@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{5cbde5ca-4331-4c62-8762-15596e0c18f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\eventManager">
+      <UniqueIdentifier>{82b20b77-e5a9-4992-8641-87b9236f6245}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{fb584cc5-866a-4ecb-8d3e-dbefae9850de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\thread">
+      <UniqueIdentifier>{fba8f1cc-f43a-41bf-9794-aaf9f07f65f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\module">
+      <UniqueIdentifier>{da326bc0-0b7b-4f4b-b030-7918a58a0d02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\transfer">
+      <UniqueIdentifier>{0a6f76f7-c505-4246-9a97-d1758768a287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{dfd73738-397c-48fe-b0ff-ae259802194c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\parser">
+      <UniqueIdentifier>{e865078d-3348-470b-bef6-736706e563f7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Class.cpp">
+      <Filter>src\eventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acframe.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Task.cpp">
+      <Filter>src\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_App.cpp">
+      <Filter>src\eventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Client.cpp">
+      <Filter>src\eventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Commandline.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Browser.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Frame.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_FrameEvents.cpp">
+      <Filter>src\transfer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_BrowserHost.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Conv.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Request.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Menu.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Value.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Download.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_DragData_Image.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_V8Context.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_ProcessMessage.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_DialogCallback.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_CookieManager.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Certificate.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_ResourceFilter.cpp">
+      <Filter>src\transfer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_DOM.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_WaitableEvent.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Scheme.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_NetTransfer.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Permissions.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Parser.cpp">
+      <Filter>src\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Extension.cpp">
+      <Filter>src\module</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\acf_Class.h">
+      <Filter>src\eventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_Types.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acframe.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_Task.h">
+      <Filter>src\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_App.h">
+      <Filter>src\eventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_Client.h">
+      <Filter>src\eventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_FrameEvents.h">
+      <Filter>src\transfer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_Conv.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_ResourceFilter.h">
+      <Filter>src\transfer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_Scheme.h">
+      <Filter>src\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acf_Parser.h">
+      <Filter>src\parser</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libacf.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
