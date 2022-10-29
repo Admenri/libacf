@@ -420,8 +420,8 @@ BOOL ECALL node_get_element_attributes(CefDOMNode* obj, LPVOID* eArray)
 	for (auto iter = keys.begin(); iter != keys.end(); iter++)
 	{
 		pStrs[index] = (DWORD)new ACF_STRING_PAIR;
-		((PACF_STRING_PAIR)pStrs[index])->key = (LPBYTE)UnicodeToEStream((*iter).first.c_str());
-		((PACF_STRING_PAIR)pStrs[index])->value = (LPBYTE)UnicodeToEStream((*iter).second.c_str());
+		((PACF_STRING_PAIR)(pStrs[index]))->key = (LPBYTE)UnicodeToEStream((*iter).first.c_str());
+		((PACF_STRING_PAIR)(pStrs[index]))->value = (LPBYTE)UnicodeToEStream((*iter).second.c_str());
 		++index;
 	}
 

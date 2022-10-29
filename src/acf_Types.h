@@ -10,6 +10,9 @@
 #define ISVALID(v) if (!v) return;
 #define ISVALIDR(v, r) if (!v) return r;
 #define ECALL __stdcall
+#ifndef OVERRIDE
+#define OVERRIDE override
+#endif
 
 //基础设置信息结构
 typedef struct _acf_basic_info {

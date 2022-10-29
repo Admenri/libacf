@@ -5,6 +5,7 @@
 #include "include/cef_browser.h"
 #include "include/cef_frame.h"
 #include "include/cef_urlrequest.h"
+#include "include/cef_waitable_event.h"
 
 #include "acf_Conv.h"
 
@@ -158,7 +159,7 @@ bool ECALL frame_get_parent(CefFrame* obj, DWORD* target)
 	CefRefPtr<CefFrame> lpParent = obj->GetParent();
 
 	lpParent->AddRef();
-	target[1] = (DWORD)((LPVOID)lpParent);
+	target[1] = (DWORD)((LPVOID)lpParent.get());
 	target[2] = (DWORD)acf_frame_funcs;
 
 	return !!lpParent;
@@ -184,7 +185,7 @@ bool ECALL frame_get_browser(CefFrame* obj, DWORD* target)
 	CefRefPtr<CefBrowser> lpParent = obj->GetBrowser();
 
 	lpParent->AddRef();
-	target[1] = (DWORD)((LPVOID)lpParent);
+	target[1] = (DWORD)((LPVOID)lpParent.get());
 	target[2] = (DWORD)acf_browser_funcs;
 
 	return !!lpParent;
@@ -199,7 +200,7 @@ bool ECALL frame_get_v8context(CefFrame* obj, DWORD* target)
 	CefRefPtr<CefV8Context> lpParent = obj->GetV8Context();
 
 	lpParent->AddRef();
-	target[1] = (DWORD)((LPVOID)lpParent);
+	target[1] = (DWORD)((LPVOID)lpParent.get());
 	target[2] = (DWORD)acf_v8_context_funcs;
 
 	return !!lpParent;
@@ -218,12 +219,12 @@ BOOL ECALL frame_create_url_request(CefFrame* obj, CefRequest* request, LPVOID l
 {
 	ISVALIDR(obj, NULL);
 
-	CefRefPtr<ACFlibURLRequestClient> lpHandler = new ACFlibURLRequestClient(lpCallback, copyData);
+	CefRefPtr<ACFlibURLRequestClient> lpHandler = lpCallback ? new ACFlibURLRequestClient(lpCallback, copyData) : nullptr;
 
 	CefRefPtr<CefURLRequest> lpRequest = obj->CreateURLRequest(request, lpHandler);
 
 	lpRequest->AddRef();
-	target[1] = (DWORD)((LPVOID)lpRequest);
+	target[1] = (DWORD)((LPVOID)lpRequest.get());
 	target[2] = (DWORD)acf_url_request_funcs;
 
 	return !!lpRequest;
@@ -240,9 +241,59 @@ void ECALL frame_set_emit_touch_events_for_mouse(CefFrame* obj, bool enabled, in
 {
 	ISVALID(obj);
 
-#ifdef ACF_EXVER
 	obj->SetEmitTouchEventsForMouse(enabled, configuration);
-#endif
+}
+
+class ACFlibStringVisitorSync : public CefStringVisitor
+{
+public:
+	ACFlibStringVisitorSync(CefRefPtr<CefWaitableEvent> lock) : m_lock(lock) {};
+	~ACFlibStringVisitorSync() = default;
+
+	std::wstring GetResult() { return m_result; }
+
+private:
+	CefRefPtr<CefWaitableEvent> m_lock;
+	std::wstring m_result;
+
+protected:
+
+	virtual void Visit(const CefString& string) OVERRIDE
+	{
+		m_result = string.ToWString();
+
+		m_lock->Signal();
+	}
+
+	IMPLEMENT_REFCOUNTING(ACFlibStringVisitorSync);
+};
+
+void ECALL frame_get_source_sync(CefFrame* obj, int max_ms, DWORD* ansi_str)
+{
+	ISVALID(obj);
+
+	CefRefPtr<CefWaitableEvent> lock = CefWaitableEvent::CreateWaitableEvent(true, false);
+
+	CefRefPtr<ACFlibStringVisitorSync> lpVisitor = new ACFlibStringVisitorSync(lock);
+	obj->GetSource(lpVisitor);
+
+	lock->TimedWait(max_ms);
+
+	*ansi_str = (DWORD)UnicodeToEStream(lpVisitor->GetResult().c_str());
+}
+
+void ECALL frame_get_text_sync(CefFrame* obj, int max_ms, DWORD* ansi_str)
+{
+	ISVALID(obj);
+
+	CefRefPtr<CefWaitableEvent> lock = CefWaitableEvent::CreateWaitableEvent(true, false);
+
+	CefRefPtr<ACFlibStringVisitorSync> lpVisitor = new ACFlibStringVisitorSync(lock);
+	obj->GetText(lpVisitor);
+
+	lock->TimedWait(max_ms);
+
+	*ansi_str = (DWORD)UnicodeToEStream(lpVisitor->GetResult().c_str());
 }
 
 DWORD acf_frame_funcs[] = {
@@ -272,4 +323,6 @@ DWORD acf_frame_funcs[] = {
 	(DWORD)&frame_create_url_request,
 	(DWORD)&frame_send_process_message,
 	(DWORD)&frame_set_emit_touch_events_for_mouse,
+	(DWORD)&frame_get_source_sync,
+	(DWORD)&frame_get_text_sync,
 };

@@ -30,7 +30,7 @@ bool ECALL cert_get_subject(CefX509Certificate* obj, DWORD* target)
 	CefRefPtr<CefX509CertPrincipal> pObj = obj->GetSubject();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_certprincipal_funcs;
 
 	return !!pObj;
@@ -43,7 +43,7 @@ bool ECALL cert_get_issuer(CefX509Certificate* obj, DWORD* target)
 	CefRefPtr<CefX509CertPrincipal> pObj = obj->GetIssuer();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_certprincipal_funcs;
 
 	return !!pObj;
@@ -56,7 +56,7 @@ bool ECALL cert_get_serial_number(CefX509Certificate* obj, DWORD* target)
 	CefRefPtr<CefBinaryValue> pObj = obj->GetSerialNumber();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_binary_funcs;
 
 	return !!pObj;
@@ -66,7 +66,7 @@ bool ECALL cert_get_valid_start(CefX509Certificate* obj, cef_time_t** target)
 {
 	ISVALIDR(obj, false);
 
-	**target = obj->GetValidStart();
+	cef_time_from_basetime(obj->GetValidStart(), *target);
 
 	return target != NULL;
 }
@@ -75,7 +75,7 @@ bool ECALL cert_get_valid_expiry(CefX509Certificate* obj, cef_time_t** target)
 {
 	ISVALIDR(obj, false);
 
-	**target = obj->GetValidExpiry();
+	cef_time_from_basetime(obj->GetValidExpiry(), *target);
 
 	return target != NULL;
 }
@@ -87,7 +87,7 @@ bool ECALL cert_get_DER_encoded(CefX509Certificate* obj, DWORD* target)
 	CefRefPtr<CefBinaryValue> pObj = obj->GetDEREncoded();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_binary_funcs;
 
 	return !!pObj;
@@ -100,7 +100,7 @@ bool ECALL cert_get_PEM_encoded(CefX509Certificate* obj, DWORD* target)
 	CefRefPtr<CefBinaryValue> pObj = obj->GetPEMEncoded();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_binary_funcs;
 
 	return !!pObj;
@@ -402,7 +402,7 @@ bool ECALL sslstatus_get_x509_certficate(CefSSLStatus* obj, DWORD* target)
 	CefRefPtr<CefX509Certificate> pObj = obj->GetX509Certificate();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_certificate_funcs;
 
 	return !!pObj;
@@ -430,7 +430,7 @@ bool ECALL sslinfo_get_x509_certficate(CefSSLInfo* obj, DWORD* target)
 	CefRefPtr<CefX509Certificate> pObj = obj->GetX509Certificate();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_certificate_funcs;
 
 	return !!pObj;

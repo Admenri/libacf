@@ -59,7 +59,7 @@ LPVOID ECALL ext_get_handler(CefExtension* obj)
 {
 	ISVALIDR(obj, NULL);
 
-	return obj->GetHandler();
+	return obj->GetHandler().get();
 }
 
 bool ECALL ext_get_loader_context(CefExtension* obj, DWORD* target)
@@ -104,7 +104,7 @@ extern DWORD acf_server_funcs[];
 
 ACF_EXPORTS(ServerCreate, void)(LPCWSTR address, int port, int backlog, LPVOID callback, BOOL copyData)
 {
-	CefRefPtr<ACFlibServerHandler> lpHandler = new ACFlibServerHandler(callback, copyData);
+	CefRefPtr<ACFlibServerHandler> lpHandler = callback ? new ACFlibServerHandler(callback, copyData) : nullptr;
 
 	CefServer::CreateServer(address, port, backlog, lpHandler);
 }

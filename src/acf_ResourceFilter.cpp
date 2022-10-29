@@ -127,8 +127,8 @@ ACFlibResourceFilter::FilterStatus ACFlibResourceFilter::Filter(void* data_in,
 
 				CefRefPtr<ACFResourceFilter> filter = new ACFResourceFilter(this);
 
-				IMP_NEWECLASS(TempBrowser, _browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-				IMP_NEWECLASS(TempFilter, filter, eClass::m_pVfResourceFilterTable, acf_resource_filter_funcs);
+				IMP_NEWECLASS(TempBrowser, _browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+				IMP_NEWECLASS(TempFilter, filter.get(), eClass::m_pVfResourceFilterTable, acf_resource_filter_funcs);
 
 				USES_CONVERSION;
 
@@ -153,7 +153,7 @@ ACFlibResourceFilter::FilterStatus ACFlibResourceFilter::Filter(void* data_in,
 					push lpUrlAddr;
 					push TempBrowser;
 					push ecx;
-					call[edx + 0x108];
+					call[edx + 0x104];
 					pop esi;
 					pop edi;
 					pop ebx;

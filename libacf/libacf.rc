@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 2,0,0,1
+ PRODUCTVERSION 2,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -68,13 +68,13 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "Admenri"
-            VALUE "FileDescription", "Admenri Cef Framework"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileDescription", "Admenri Cef Framework 2"
+            VALUE "FileVersion", "2.0.0.1"
             VALUE "InternalName", "libacf.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2015-2021 Admenri."
+            VALUE "LegalCopyright", "Copyright (C) 2015-2022 Admenri."
             VALUE "OriginalFilename", "libacf.dll"
-            VALUE "ProductName", "Admenri Cef Framework"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductName", "Admenri Cef Framework 2"
+            VALUE "ProductVersion", "2.0.0.1"
         END
     END
     BLOCK "VarFileInfo"

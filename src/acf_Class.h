@@ -42,6 +42,10 @@ extern DWORD acf_extension_funcs[];
 extern DWORD acf_stream_reader_funcs[];
 extern DWORD acf_stream_writer_funcs[];
 extern DWORD acf_server_funcs[];
+extern DWORD acf_view_funcs[];
+extern DWORD acf_window_funcs[];
+extern DWORD acf_panel_funcs[];
+extern DWORD acf_browser_view_funcs[];
 
 extern DWORD acf_callback_run_menu[];
 extern DWORD acf_callback_download[];
@@ -57,6 +61,8 @@ extern DWORD acf_callback[];
 extern DWORD acf_callback_v8retval[];
 extern DWORD acf_callback_onpopup[];
 extern DWORD acf_callback_extension_resource[];
+extern DWORD acf_callback_permission[];
+extern DWORD acf_callback_permissionmedia[];
 
 ACF_EXPORTS(NewClass, void)(DWORD **pNewClass,int nType);
 
@@ -109,6 +115,10 @@ namespace eClass {
 	extern DWORD m_pVfStreamReaderTable;
 	extern DWORD m_pVfStreamWriterTable;
 	extern DWORD m_pVfServerTable;
+	extern DWORD m_pVfViewTable;
+	extern DWORD m_pVfWindowTable;
+	extern DWORD m_pVfPanelTable;
+	extern DWORD m_pVfBrowserViewTable;
 
 	// Callback Part
 	extern DWORD m_pVfCallbackMenu;
@@ -125,6 +135,8 @@ namespace eClass {
 	extern DWORD m_pVfCallbackV8RetVal;
 	extern DWORD m_pVfCallbackOnPopup;
 	extern DWORD m_pVfCallbackExtensionResource;
+	extern DWORD m_pVfCallbackPermission;
+	extern DWORD m_pVfCallbackPermissionMedia;
 
 	// Struct Part
 	extern DWORD m_infoTable;

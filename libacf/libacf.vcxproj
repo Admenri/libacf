@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="ReleaseEX|Win32">
-      <Configuration>ReleaseEX</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -21,15 +17,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Static</UseOfMfc>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseEX|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Static</UseOfMfc>
@@ -42,21 +30,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseEX|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)out\</OutDir>
-    <TargetName>libacf</TargetName>
+    <TargetName>libacf2</TargetName>
     <IntDir>$(SolutionDir)out\obj\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseEX|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)out_ex\</OutDir>
-    <TargetName>libacf</TargetName>
-    <IntDir>$(SolutionDir)out_ex\obj\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -85,52 +64,13 @@
       <EnableUAC>false</EnableUAC>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalLibraryDirectories>..\env\lib\;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>user32.lib;kernel32.lib;chrome.lib;libcef_dll_wrapper.lib</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;kernel32.lib;libcef.lib;libcef_dll_wrapper.lib</AdditionalDependencies>
       <ProgramDatabaseFile />
       <ManifestFile>$(OutDir)$(TargetName)$(TargetExt).manifest</ManifestFile>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
     </Link>
     <BuildLog>
       <Path />
-    </BuildLog>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseEX|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ACF_EXVER;WIN32;NDEBUG;LIBACF_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>false</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>
-      </PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>..\env_ex\;</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4996;26812;4018</DisableSpecificWarnings>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>
-      </GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
-      <LargeAddressAware>true</LargeAddressAware>
-      <AdditionalLibraryDirectories>..\env_ex\lib\;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>user32.lib;kernel32.lib;chrome.lib;libcef_dll_wrapper.lib</AdditionalDependencies>
-      <ProgramDatabaseFile>
-      </ProgramDatabaseFile>
-      <ManifestFile>$(OutDir)$(TargetName)$(TargetExt).manifest</ManifestFile>
-      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-    </Link>
-    <BuildLog>
-      <Path>
-      </Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -152,6 +92,7 @@
     <ClCompile Include="..\src\acf_Permissions.cpp" />
     <ClCompile Include="..\src\acf_ProcessMessage.cpp" />
     <ClCompile Include="..\src\acf_ResourceFilter.cpp" />
+    <ClCompile Include="..\src\acf_ResourceHandler.cpp" />
     <ClCompile Include="..\src\acf_Scheme.cpp" />
     <ClCompile Include="..\src\acf_Extension.cpp" />
     <ClCompile Include="..\src\acf_V8Context.cpp" />
@@ -162,6 +103,7 @@
     <ClCompile Include="..\src\acf_Request.cpp" />
     <ClCompile Include="..\src\acf_Task.cpp" />
     <ClCompile Include="..\src\acf_Download.cpp" />
+    <ClCompile Include="..\src\acf_Views.cpp" />
     <ClCompile Include="..\src\acf_WaitableEvent.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
@@ -174,6 +116,7 @@
     <ClInclude Include="..\src\acf_FrameEvents.h" />
     <ClInclude Include="..\src\acf_Parser.h" />
     <ClInclude Include="..\src\acf_ResourceFilter.h" />
+    <ClInclude Include="..\src\acf_ResourceHandler.h" />
     <ClInclude Include="..\src\acf_Scheme.h" />
     <ClInclude Include="..\src\acf_Task.h" />
     <ClInclude Include="..\src\acf_Types.h" />
@@ -183,8 +126,7 @@
     <ResourceCompile Include="libacf.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\AdmCef.e" />
-    <None Include="..\AdmCefModule.ec" />
+    <None Include="..\acf2_wrapper.e" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

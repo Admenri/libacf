@@ -24,7 +24,7 @@ void ACFlibApp::OnBeforeCommandLineProcessing(
 	if (this->m_pAppCallback != NULL)
 	{
 		command_line->AddRef();
-		IMP_NEWECLASS(TempVfptr, command_line, eClass::m_pVfCmdTable, acf_commandline_funcs);
+		IMP_NEWECLASS(TempVfptr, command_line.get(), eClass::m_pVfCmdTable, acf_commandline_funcs);
 
 		LPVOID strProcessType = UnicodeToEStream(process_type.c_str());
 		LPVOID lpTempAddr = &strProcessType;
@@ -80,7 +80,7 @@ void ACFlibApp::OnBeforeChildProcessLaunch(
 	if (this->m_pAppCallback != NULL)
 	{
 		command_line->AddRef();
-		IMP_NEWECLASS(TempVfptr, command_line, eClass::m_pVfCmdTable, acf_commandline_funcs);
+		IMP_NEWECLASS(TempVfptr, command_line.get(), eClass::m_pVfCmdTable, acf_commandline_funcs);
 		LPVOID pClass = this->m_pAppCallback;
 		__asm {
 			push ecx;
@@ -152,7 +152,7 @@ void ACFlibApp::OnWebKitInitialized()
 			pop esi;
 		}
 	}
-};
+}
 
 void ACFlibApp::OnBrowserCreated(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefDictionaryValue> extra_info)
@@ -160,10 +160,12 @@ void ACFlibApp::OnBrowserCreated(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempDictionary, extra_info, eClass::m_pVfDictionaryTable, acf_dictionary_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempDictionary, extra_info.get() ? extra_info.get() : NULL, eClass::m_pVfDictionaryTable, acf_dictionary_funcs);
+
 		browser->AddRef();
-		extra_info->AddRef();
+		if (extra_info)
+			extra_info->AddRef();
 		__asm {
 			push ecx;
 			push esi;
@@ -181,17 +183,18 @@ void ACFlibApp::OnBrowserCreated(CefRefPtr<CefBrowser> browser,
 			pop edi;
 			pop esi;
 		}
+		if (extra_info)
+			extra_info->Release();
 		browser->Release();
-		extra_info->Release();
 	}
-};
+}
 
 void ACFlibApp::OnBrowserDestroyed(CefRefPtr<CefBrowser> browser)
 {
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
 		browser->AddRef();
 		__asm {
 			push ecx;
@@ -211,7 +214,7 @@ void ACFlibApp::OnBrowserDestroyed(CefRefPtr<CefBrowser> browser)
 		}
 		browser->Release();
 	}
-};
+}
 
 void ACFlibApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -220,9 +223,9 @@ void ACFlibApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempContext, context, eClass::m_pVfV8ContextTable, acf_v8_context_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempContext, context.get(), eClass::m_pVfV8ContextTable, acf_v8_context_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		context->AddRef();
@@ -248,7 +251,7 @@ void ACFlibApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
 		frame->Release();
 		context->Release();
 	}
-};
+}
 
 void ACFlibApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -257,9 +260,9 @@ void ACFlibApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempContext, context, eClass::m_pVfV8ContextTable, acf_v8_context_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempContext, context.get(), eClass::m_pVfV8ContextTable, acf_v8_context_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		context->AddRef();
@@ -285,7 +288,7 @@ void ACFlibApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
 		frame->Release();
 		context->Release();
 	}
-};
+}
 
 void ACFlibApp::OnUncaughtException(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -296,11 +299,11 @@ void ACFlibApp::OnUncaughtException(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempContext, context, eClass::m_pVfV8ContextTable, acf_v8_context_funcs);
-		IMP_NEWECLASS(TempException, exception, eClass::m_pVfV8ExceptionTable, acf_v8_exception_funcs);
-		IMP_NEWECLASS(TempStackTrace, stackTrace, eClass::m_pVfV8StackTraceTable, acf_v8_stack_trace_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempContext, context.get(), eClass::m_pVfV8ContextTable, acf_v8_context_funcs);
+		IMP_NEWECLASS(TempException, exception.get(), eClass::m_pVfV8ExceptionTable, acf_v8_exception_funcs);
+		IMP_NEWECLASS(TempStackTrace, stackTrace.get(), eClass::m_pVfV8StackTraceTable, acf_v8_stack_trace_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		context->AddRef();
@@ -332,7 +335,7 @@ void ACFlibApp::OnUncaughtException(CefRefPtr<CefBrowser> browser,
 		exception->Release();
 		stackTrace->Release();
 	}
-};
+}
 
 void ACFlibApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -341,9 +344,9 @@ void ACFlibApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempNode, node, eClass::m_pVfDOMNodeTable, acf_dom_node_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempNode, node.get(), eClass::m_pVfDOMNodeTable, acf_dom_node_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		if (node)
@@ -371,7 +374,7 @@ void ACFlibApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser,
 		if (node)
 			node->Release();
 	}
-};
+}
 
 bool ACFlibApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -381,9 +384,9 @@ bool ACFlibApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempMessage, message, eClass::m_pVfProcessMessageTable, acf_process_message_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempMessage, message.get(), eClass::m_pVfProcessMessageTable, acf_process_message_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		message->AddRef();
@@ -414,7 +417,7 @@ bool ACFlibApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		return nRetVal;
 	}
 	return false;
-};
+}
 
 void ACFlibApp::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 	bool isLoading,
@@ -424,7 +427,7 @@ void ACFlibApp::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
 		browser->AddRef();
 		__asm {
 			push ecx;
@@ -450,7 +453,7 @@ void ACFlibApp::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 		}
 		browser->Release();
 	}
-};
+}
 
 void ACFlibApp::OnLoadStart(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -459,8 +462,8 @@ void ACFlibApp::OnLoadStart(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		__asm {
@@ -484,7 +487,7 @@ void ACFlibApp::OnLoadStart(CefRefPtr<CefBrowser> browser,
 		browser->Release();
 		frame->Release();
 	}
-};
+}
 
 void ACFlibApp::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -493,8 +496,8 @@ void ACFlibApp::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
 		browser->AddRef();
 		frame->AddRef();
 		__asm {
@@ -518,7 +521,7 @@ void ACFlibApp::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 		browser->Release();
 		frame->Release();
 	}
-};
+}
 
 void ACFlibApp::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
@@ -529,8 +532,8 @@ void ACFlibApp::OnLoadError(CefRefPtr<CefBrowser> browser,
 	if (this->m_pAppCallback != NULL)
 	{
 		LPVOID pClass = this->m_pAppCallback;
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
 		browser->AddRef();
 		frame->AddRef();
 
@@ -564,4 +567,10 @@ void ACFlibApp::OnLoadError(CefRefPtr<CefBrowser> browser,
 		browser->Release();
 		frame->Release();
 	}
-};
+}
+
+void ACFlibApp::OnRegisterCustomSchemes(
+	CefRawPtr<CefSchemeRegistrar> registrar)
+{
+	// FIXME: ready to add binding to epl
+}

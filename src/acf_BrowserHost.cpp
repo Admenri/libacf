@@ -23,7 +23,7 @@ bool ECALL host_get_browser(CefBrowserHost* obj, DWORD* target)
 	CefRefPtr<CefBrowser> pBrowser = obj->GetBrowser();
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_browser_funcs;
 
 	return !!pBrowser;
@@ -85,7 +85,7 @@ bool ECALL host_get_request_context(CefBrowserHost* obj, DWORD* target)
 	CefRefPtr<CefRequestContext> pBrowser = obj->GetRequestContext();
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_request_context_funcs;
 
 	return !!pBrowser;
@@ -108,7 +108,7 @@ void ECALL host_set_zoom_level(CefBrowserHost* obj, double* level)
 }
 
 void ECALL host_run_file_dialog(CefBrowserHost* obj, int mode, LPCWSTR title, LPCWSTR def_path,
-	LPVOID* accept_filters, int sel_filter, LPVOID callback, BOOL copyData)
+	LPVOID* accept_filters, LPVOID callback, BOOL copyData)
 {
 	ISVALID(obj);
 
@@ -123,9 +123,9 @@ void ECALL host_run_file_dialog(CefBrowserHost* obj, int mode, LPCWSTR title, LP
 		pArgs[i] = (LPSTR)(((LPDWORD)(pArgsList + sizeof(INT) * 2))[i]);
 	}
 
-	CefRefPtr<ACFlibRunFileDialogCallback> lpHandler = new ACFlibRunFileDialogCallback(callback, copyData);
+	CefRefPtr<ACFlibRunFileDialogCallback> lpHandler = callback ? new ACFlibRunFileDialogCallback(callback, copyData) : nullptr;
 
-	obj->RunFileDialog((cef_file_dialog_mode_t)mode, title, def_path, pArgs, sel_filter, lpHandler);
+	obj->RunFileDialog((cef_file_dialog_mode_t)mode, title, def_path, pArgs, lpHandler);
 }
 
 void ECALL host_start_download(CefBrowserHost* obj, LPCWSTR url)
@@ -140,7 +140,7 @@ void ECALL host_download_image(CefBrowserHost* obj, LPCWSTR url, bool is_icon,
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibDownloadImageCallback> lpHandler = new ACFlibDownloadImageCallback(callback, copyData);
+	CefRefPtr<ACFlibDownloadImageCallback> lpHandler = callback ? new ACFlibDownloadImageCallback(callback, copyData) : nullptr;
 
 	obj->DownloadImage(url, is_icon, max_image_size, bypass_cache, lpHandler);
 }
@@ -156,16 +156,16 @@ void ECALL host_print_to_pdf(CefBrowserHost* obj, LPCWSTR path, cef_pdf_print_se
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibPdfPrintCallback> lpHandler = new ACFlibPdfPrintCallback(callback, copyData);
+	CefRefPtr<ACFlibPdfPrintCallback> lpHandler = callback ? new ACFlibPdfPrintCallback(callback, copyData) : nullptr;
 
 	obj->PrintToPDF(path, **settings, lpHandler);
 }
 
-void ECALL host_find(CefBrowserHost* obj, int id, LPCWSTR text, bool foward, bool case_sensitive, bool show_in_handler)
+void ECALL host_find(CefBrowserHost* obj, LPCWSTR text, bool foward, bool case_sensitive, bool findNext)
 {
 	ISVALID(obj);
 
-	obj->Find(id, text, foward, case_sensitive, show_in_handler);
+	obj->Find(text, foward, case_sensitive, findNext);
 }
 
 void ECALL host_stopfinding(CefBrowserHost* obj, bool clear)
@@ -220,14 +220,14 @@ LPVOID ECALL host_add_devtools_message_observer(CefBrowserHost* obj, LPVOID obse
 
 	CefRefPtr<ACFlibDevToolsMessageObserver> lpObserver = new ACFlibDevToolsMessageObserver(observer, copyData);
 
-	return obj->AddDevToolsMessageObserver(lpObserver);
+	return obj->AddDevToolsMessageObserver(lpObserver).get();
 }
 
 bool ECALL host_get_navigation_entries(CefBrowserHost* obj, LPVOID visitor, BOOL copyData, bool current)
 {
 	ISVALIDR(obj, NULL);
 
-	CefRefPtr<ACFlibNavigationEntryVisitor> lpHandler = new ACFlibNavigationEntryVisitor(visitor, copyData);
+	CefRefPtr<ACFlibNavigationEntryVisitor> lpHandler = visitor ? new ACFlibNavigationEntryVisitor(visitor, copyData) : nullptr;
 
 	obj->GetNavigationEntries(lpHandler, current);
 
@@ -237,15 +237,12 @@ bool ECALL host_get_navigation_entries(CefBrowserHost* obj, LPVOID visitor, BOOL
 void ECALL host_set_mouse_change_disabled(CefBrowserHost* obj, bool disabled)
 {
 	ISVALID(obj);
-
-	obj->SetMouseCursorChangeDisabled(disabled);
 }
 
 bool ECALL host_is_mouse_change_disabled(CefBrowserHost* obj)
 {
 	ISVALIDR(obj, false);
-
-	return obj->IsMouseCursorChangeDisabled();
+	return false;
 }
 
 void ECALL host_replace_misspelling(CefBrowserHost* obj, LPCWSTR word)
@@ -352,8 +349,6 @@ void ECALL host_send_touch_event(CefBrowserHost* obj, cef_touch_event_t** lppEve
 void ECALL host_focus_event(CefBrowserHost* obj, bool focus)
 {
 	ISVALID(obj);
-
-	obj->SendFocusEvent(focus);
 }
 
 void ECALL host_send_capture_lost_event(CefBrowserHost* obj)
@@ -480,7 +475,7 @@ BOOL ECALL host_get_visible_navigation_entry(CefBrowserHost* obj, DWORD* target)
 	CefRefPtr<CefNavigationEntry> pObj = obj->GetVisibleNavigationEntry();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_navigation_entry_funcs;
 
 	return target != NULL;
@@ -508,7 +503,7 @@ bool ECALL host_get_extension(CefBrowserHost* obj, DWORD* target)
 	CefRefPtr<CefExtension> pObj = obj->GetExtension();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_extension_funcs;
 
 	return !!pObj;
@@ -542,18 +537,32 @@ void ECALL host_set_view_visible(CefBrowserHost* obj, bool visible)
 	obj->SetViewVisible(visible);
 }
 
-void ECALL host_set_page_frozen(CefBrowserHost* obj, bool frozen)
+int ECALL host_get_view_visibility(CefBrowserHost* obj)
 {
-	ISVALID(obj);
+	ISVALIDR(obj, -1);
 
-	obj->SetPageFrozen(frozen);
+	return obj->GetViewVisibility();
 }
 
-void ECALL host_save_page(CefBrowserHost* obj, LPCWSTR main_file, LPCWSTR dir_path, cef_save_page_type_t type)
+void ECALL host_exit_fullscreen(CefBrowserHost* obj, bool resize)
 {
 	ISVALID(obj);
 
-	obj->SavePageTo(main_file, dir_path, type);
+	obj->ExitFullscreen(resize);
+}
+
+void ECALL host_set_lock_mouse_permission_response(CefBrowserHost* obj, bool allow)
+{
+	ISVALID(obj);
+
+	obj->SetLockMousePermissionResponse(allow);
+}
+
+void ECALL host_set_lock_keyboard_permission_response(CefBrowserHost* obj, bool allow)
+{
+	ISVALID(obj);
+
+	obj->SetResponseToKeyboardLockRequest(allow);
 }
 
 DWORD acf_browser_host_funcs[] = {
@@ -620,8 +629,10 @@ DWORD acf_browser_host_funcs[] = {
 	(DWORD)&host_set_audio_muted,
 	(DWORD)&host_is_audio_muted,
 	(DWORD)&host_set_view_visible,
-	(DWORD)&host_set_page_frozen,
-	(DWORD)&host_save_page,
+	(DWORD)&host_get_view_visibility,
+	(DWORD)&host_exit_fullscreen,
+	(DWORD)&host_set_lock_mouse_permission_response,
+	(DWORD)&host_set_lock_keyboard_permission_response,
 };
 
 ACF_EXPORTS(RequestContextGetGlobal, BOOL)(DWORD* target)
@@ -637,7 +648,7 @@ ACF_EXPORTS(RequestContextGetGlobal, BOOL)(DWORD* target)
 
 ACF_EXPORTS(RequestContextCreate, BOOL)(DWORD* target, PACF_REQUEST_CONTEXT_SETTINGS settings, LPVOID lpCallback, BOOL copyData)
 {
-	CefRefPtr<ACFlibRequestContextHandler> lpHandler = new ACFlibRequestContextHandler(lpCallback, copyData);
+	CefRefPtr<ACFlibRequestContextHandler> lpHandler = lpCallback ? new ACFlibRequestContextHandler(lpCallback, copyData) : nullptr;
 
 	CefRequestContextSettings pSettings;
 
@@ -647,7 +658,6 @@ ACF_EXPORTS(RequestContextCreate, BOOL)(DWORD* target, PACF_REQUEST_CONTEXT_SETT
 		CefString(&pSettings.accept_language_list) = settings->accept_language_list;
 	pSettings.persist_session_cookies = settings->persist_session_cookies;
 	pSettings.persist_user_preferences = settings->persist_user_preferences;
-	pSettings.ignore_certificate_errors = settings->ignore_cert_error;
 
 	CefRefPtr<CefRequestContext> lpObj = CefRequestContext::CreateContext(pSettings, lpHandler);
 
@@ -660,7 +670,7 @@ ACF_EXPORTS(RequestContextCreate, BOOL)(DWORD* target, PACF_REQUEST_CONTEXT_SETT
 
 ACF_EXPORTS(RequestContextCreateOther, BOOL)(DWORD* target, CefRequestContext* other, LPVOID lpCallback, BOOL copyData)
 {
-	CefRefPtr<ACFlibRequestContextHandler> lpHandler = new ACFlibRequestContextHandler(lpCallback, copyData);
+	CefRefPtr<ACFlibRequestContextHandler> lpHandler = lpCallback ? new ACFlibRequestContextHandler(lpCallback, copyData) : nullptr;
 
 	CefRefPtr<CefRequestContext> lpObj = CefRequestContext::CreateContext(other, lpHandler);
 
@@ -696,7 +706,7 @@ LPVOID ECALL requestcontext_get_handler(CefRequestContext* obj)
 {
 	ISVALIDR(obj, NULL);
 
-	return obj->GetHandler();
+	return obj->GetHandler().get();
 }
 
 bool ECALL requestcontext_get_cache_path(CefRequestContext* obj, DWORD* str)
@@ -714,12 +724,12 @@ bool ECALL requestcontext_get_cookie_manager(CefRequestContext* obj, LPVOID lpCa
 {
 	ISVALIDR(obj, false);
 
-	CefRefPtr<ACFlibCompletionCallback> lpHandler = new ACFlibCompletionCallback(lpCallback, copyData);
+	CefRefPtr<ACFlibCompletionCallback> lpHandler = lpCallback ? new ACFlibCompletionCallback(lpCallback, copyData) : nullptr;
 
 	CefRefPtr<CefCookieManager> pBrowser = obj->GetCookieManager(lpHandler);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_cookie_manager_funcs;
 
 	return true;
@@ -729,7 +739,7 @@ bool ECALL requestcontext_register_scheme_handler_factory(CefRequestContext* obj
 {
 	ISVALIDR(obj, NULL);
 
-	CefRefPtr<ACFlibSchemeHandler> lpHandler = new ACFlibSchemeHandler(callback, copyData);
+	CefRefPtr<ACFlibSchemeHandler> lpHandler = callback ? new ACFlibSchemeHandler(callback, copyData) : nullptr;
 
 	return obj->RegisterSchemeHandlerFactory(scheme, domain, lpHandler);
 }
@@ -744,8 +754,6 @@ bool ECALL requestcontext_clear_scheme_handler_factories(CefRequestContext* obj)
 void ECALL requestcontext_purge_plugin_list_cache(CefRequestContext* obj, bool reload_pages)
 {
 	ISVALID(obj);
-
-	obj->PurgePluginListCache(reload_pages);
 }
 
 bool ECALL requestcontext_has_preference(CefRequestContext* obj, LPCWSTR name)
@@ -762,7 +770,7 @@ bool ECALL requestcontext_get_preference(CefRequestContext* obj, LPCWSTR name, D
 	CefRefPtr<CefValue> pBrowser = obj->GetPreference(name);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_value_funcs;
 
 	return true;
@@ -775,7 +783,7 @@ bool ECALL requestcontext_get_all_preferences(CefRequestContext* obj, bool inclu
 	CefRefPtr<CefDictionaryValue> pBrowser = obj->GetAllPreferences(include_defaults);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_dictionary_funcs;
 
 	return !!target;
@@ -807,7 +815,7 @@ void ECALL requestcontext_clear_certificate_exceptions(CefRequestContext* obj, L
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibCompletionCallback> lpHandler = new ACFlibCompletionCallback(lpCallback, copyData);
+	CefRefPtr<ACFlibCompletionCallback> lpHandler = lpCallback ? new ACFlibCompletionCallback(lpCallback, copyData) : nullptr;
 
 	obj->ClearCertificateExceptions(lpHandler);
 }
@@ -816,7 +824,7 @@ void ECALL requestcontext_clear_http_auth_credentials(CefRequestContext* obj, LP
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibCompletionCallback> lpHandler = new ACFlibCompletionCallback(lpCallback, copyData);
+	CefRefPtr<ACFlibCompletionCallback> lpHandler = lpCallback ? new ACFlibCompletionCallback(lpCallback, copyData) : nullptr;
 
 	obj->ClearHttpAuthCredentials(lpHandler);
 }
@@ -825,7 +833,7 @@ void ECALL requestcontext_close_all_connections(CefRequestContext* obj, LPVOID l
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibCompletionCallback> lpHandler = new ACFlibCompletionCallback(lpCallback, copyData);
+	CefRefPtr<ACFlibCompletionCallback> lpHandler = lpCallback ? new ACFlibCompletionCallback(lpCallback, copyData) : nullptr;
 
 	obj->CloseAllConnections(lpHandler);
 }
@@ -834,7 +842,7 @@ void ECALL requestcontext_resolve_host(CefRequestContext* obj, LPCWSTR origin, L
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibResolveCallback> lpHandler = new ACFlibResolveCallback(lpCallback, copyData);
+	CefRefPtr<ACFlibResolveCallback> lpHandler = lpCallback ? new ACFlibResolveCallback(lpCallback, copyData) : nullptr;
 
 	obj->ResolveHost(origin, lpHandler);
 }
@@ -843,7 +851,7 @@ void ECALL requestcontext_load_extension(CefRequestContext* obj, LPCWSTR root_di
 {
 	ISVALID(obj);
 
-	CefRefPtr<ACFlibExtensionHandler> lpHandler = new ACFlibExtensionHandler(callback, copyData);
+	CefRefPtr<ACFlibExtensionHandler> lpHandler = callback ? new ACFlibExtensionHandler(callback, copyData) : nullptr;
 
 	obj->LoadExtension(root_dir, manifest, lpHandler);
 }
@@ -892,11 +900,13 @@ BOOL ECALL requestcontext_get_extensions(CefRequestContext* obj, LPVOID* eArray)
 
 BOOL ECALL requestcontext_get_extension(CefRequestContext* obj, LPCWSTR extension_id, DWORD* target)
 {
+	ISVALIDR(obj, NULL);
+
 	CefRefPtr<CefExtension> pObj = obj->GetExtension(extension_id);
 
 	if (pObj)
 		pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_extension_funcs;
 
 	return !!target;
@@ -904,6 +914,8 @@ BOOL ECALL requestcontext_get_extension(CefRequestContext* obj, LPCWSTR extensio
 
 void ECALL requestcontext_get_media_router(CefRequestContext* obj)
 {
+	ISVALID(obj);
+
 	// FIXME
 }
 
@@ -1003,7 +1015,7 @@ BOOL ECALL navigation_get_completion_time(CefNavigationEntry* obj, cef_time_t** 
 {
 	ISVALIDR(obj, NULL);
 
-	**pTime = obj->GetCompletionTime();
+	cef_time_from_basetime(obj->GetCompletionTime(), *pTime);
 
 	return pTime != NULL;
 }
@@ -1022,7 +1034,7 @@ BOOL ECALL navigation_get_ssl_status(CefNavigationEntry* obj, DWORD* target)
 	CefRefPtr<CefSSLStatus> pObj = obj->GetSSLStatus();
 
 	pObj->AddRef();
-	target[1] = (DWORD)((LPVOID)pObj);
+	target[1] = (DWORD)((LPVOID)pObj.get());
 	target[2] = (DWORD)acf_ssl_status_funcs;
 
 	return target != 0;

@@ -29,6 +29,12 @@
     <Filter Include="src\parser">
       <UniqueIdentifier>{e865078d-3348-470b-bef6-736706e563f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\app">
+      <UniqueIdentifier>{7f901f7c-2b53-4f66-aca8-7dbd89809ae1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ui">
+      <UniqueIdentifier>{a88f243a-7e58-4b6f-9a1d-8ab5503a2df8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -36,9 +42,6 @@
     </ClCompile>
     <ClCompile Include="..\src\acf_Class.cpp">
       <Filter>src\eventManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\acframe.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\acf_Task.cpp">
       <Filter>src\thread</Filter>
@@ -121,6 +124,15 @@
     <ClCompile Include="..\src\acf_Extension.cpp">
       <Filter>src\module</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\acf_ResourceHandler.cpp">
+      <Filter>src\eventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acframe.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\acf_Views.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\acf_Class.h">
@@ -128,9 +140,6 @@
     </ClInclude>
     <ClInclude Include="..\src\acf_Types.h">
       <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\acframe.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\acf_Task.h">
       <Filter>src\thread</Filter>
@@ -159,6 +168,12 @@
     <ClInclude Include="..\src\acf_Parser.h">
       <Filter>src\parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\acf_ResourceHandler.h">
+      <Filter>src\eventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\acframe.h">
+      <Filter>src\app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="libacf.rc">
@@ -166,7 +181,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\AdmCef.e" />
-    <None Include="..\AdmCefModule.ec" />
+    <None Include="..\acf2_wrapper.e">
+      <Filter>src</Filter>
+    </None>
   </ItemGroup>
 </Project>

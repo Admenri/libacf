@@ -9,15 +9,24 @@
 
 #include "include/cef_base.h"
 #include "include/cef_browser.h"
-#include "include/cef_web_plugin.h"
 #include "include/cef_parser.h"
 #include "include/cef_urlrequest.h"
 #include "include/cef_waitable_event.h"
 #include "include/cef_api_hash.h"
 #include "include/cef_server.h"
 
+#include "include/views/cef_browser_view.h"
+#include "include/views/cef_view.h"
+#include "include/views/cef_window.h"
+#include "include/views/cef_panel.h"
+
 namespace {
 	WindowEventCallback g_pListWindowEvent;
+}
+
+ACF_EXPORTS(SetGoogleAPIInfo, void)(int type, const char* value)
+{
+	// FIXME
 }
 
 // 增加引用
@@ -147,6 +156,19 @@ ACF_EXPORTS(AddRef, void)(LPVOID object, int nType)
 		case 10039:
 			static_cast<CefServer*>(object)->AddRef();
 			break;
+		case 10040:
+			static_cast<CefView*>(object)->AddRef();
+			break;
+		case 10041:
+			static_cast<CefWindow*>(object)->AddRef();
+			break;
+		case 10042:
+			static_cast<CefPanel*>(object)->AddRef();
+			break;
+		case 10043:
+			static_cast<CefBrowserView*>(object)->AddRef();
+			break;
+
 
 		case 30000:
 			static_cast<CefRunContextMenuCallback*>(object)->AddRef();
@@ -167,7 +189,7 @@ ACF_EXPORTS(AddRef, void)(LPVOID object, int nType)
 			static_cast<CefAuthCallback*>(object)->AddRef();
 			break;
 		case 30006:
-			static_cast<CefRequestCallback*>(object)->AddRef();
+			static_cast<CefCallback*>(object)->AddRef();
 			break;
 		case 30007:
 			static_cast<CefSelectClientCertificateCallback*>(object)->AddRef();
@@ -189,6 +211,12 @@ ACF_EXPORTS(AddRef, void)(LPVOID object, int nType)
 			break;
 		case 30013:
 			static_cast<CefGetExtensionResourceCallback*>(object)->AddRef();
+			break;
+		case 30014:
+			static_cast<CefMediaAccessCallback*>(object)->AddRef();
+			break;
+		case 30015:
+			static_cast<CefPermissionPromptCallback*>(object)->AddRef();
 			break;
 
 		default:
@@ -324,6 +352,18 @@ ACF_EXPORTS(Release, void)(LPVOID object, int nType)
 		case 10039:
 			static_cast<CefServer*>(object)->Release();
 			break;
+		case 10040:
+			static_cast<CefView*>(object)->Release();
+			break;
+		case 10041:
+			static_cast<CefWindow*>(object)->Release();
+			break;
+		case 10042:
+			static_cast<CefPanel*>(object)->Release();
+			break;
+		case 10043:
+			static_cast<CefBrowserView*>(object)->Release();
+			break;
 
 		case 30000:
 			static_cast<CefRunContextMenuCallback*>(object)->Release();
@@ -344,7 +384,7 @@ ACF_EXPORTS(Release, void)(LPVOID object, int nType)
 			static_cast<CefAuthCallback*>(object)->Release();
 			break;
 		case 30006:
-			static_cast<CefRequestCallback*>(object)->Release();
+			static_cast<CefCallback*>(object)->Release();
 			break;
 		case 30007:
 			static_cast<CefSelectClientCertificateCallback*>(object)->Release();
@@ -367,6 +407,12 @@ ACF_EXPORTS(Release, void)(LPVOID object, int nType)
 		case 30013:
 			static_cast<CefGetExtensionResourceCallback*>(object)->Release();
 			break;
+		case 30014:
+			static_cast<CefMediaAccessCallback*>(object)->Release();
+			break;
+		case 30015:
+			static_cast<CefPermissionPromptCallback*>(object)->Release();
+			break;
 
 		default:
 			break;
@@ -374,85 +420,19 @@ ACF_EXPORTS(Release, void)(LPVOID object, int nType)
 	}
 }
 
-std::vector<std::string> str_split(const std::string& str, const std::string& pattern)
-{
-	// const char* convert to char*
-	char* strc = new char[strlen(str.c_str()) + 1];
-	strcpy(strc, str.c_str());
-	std::vector<std::string> resultVec;
-	char* tmpStr = strtok(strc, pattern.c_str());
-	while (tmpStr != NULL)
-	{
-		resultVec.push_back(std::string(tmpStr));
-		tmpStr = strtok(NULL, pattern.c_str());
-	}
-
-	delete[] strc;
-
-	return resultVec;
-}
-
-ACF_EXPORTS(SetAdmenriProductKey, BOOL)(LPSTR key)
-{
-	std::vector<std::string> pInfos = str_split(key, "$");
-
-	if (pInfos.size() >= 3) {
-		CefSetGoogleAPIInfo(GOOGLE_API_KEY, pInfos[0]);
-		CefSetGoogleAPIInfo(GOOGLE_CLIENT_ID_MAIN, pInfos[1]);
-		CefSetGoogleAPIInfo(GOOGLE_CLIENT_SECRET_MAIN, pInfos[2]);
-		return true;
-	}
-	return false;
-}
-
-#ifdef ACF_EXVER
-
-namespace {
-	std::string ex_key;
-}
-
-void __stdcall set_key(LPSTR key)
-{
-	ex_key = key;
-}
-
-ACF_EXPORTS(RegisterEXVersion, BOOL)(DWORD* address)
-{
-	*address = (DWORD)&set_key;
-	return true;
-}
-
-#endif // ACF_EXVER
-
 ACF_EXPORTS(ExecuteProcess, int)(LPVOID lpAppEvents, BOOL copyData)
 {
-
-#ifdef ACF_EXVER
-
-	if (!(ex_key == cef_api_hash(0)))
-		return NULL;
-
-#endif // ACF_EXVER
-
 	CefMainArgs main_args(GetModuleHandle(NULL));
 	CefRefPtr<ACFlibApp> lpObjApp = new ACFlibApp(lpAppEvents, copyData);
 
-	return CefExecuteProcess(main_args, lpObjApp.get(), NULL);
+	return CefExecuteProcess(main_args, lpObjApp, NULL);
 }
 
 ACF_EXPORTS(Initialize, BOOL)(PACF_BASIC_INFO lpBasicInfo, LPVOID lpAppEvents, BOOL copyData)
 {
-
-#ifdef ACF_EXVER
-
-	if (!(ex_key == cef_api_hash(0)))
-		return NULL;
-
-#endif // ACF_EXVER
-
 	CefMainArgs main_args(GetModuleHandle(NULL));
 	CefSettings basic_info;
-	CefRefPtr<ACFlibApp> lpObjApp = new ACFlibApp(lpAppEvents, copyData);
+	CefRefPtr<ACFlibApp> lpObjApp = lpAppEvents ? new ACFlibApp(lpAppEvents, copyData) : nullptr;
 
 	wchar_t* lpwszBuffer = 0;
 #define TRANS_SETTING_STR(name) \
@@ -465,14 +445,12 @@ ACF_EXPORTS(Initialize, BOOL)(PACF_BASIC_INFO lpBasicInfo, LPVOID lpAppEvents, B
 	TRANS_SETTING_STR(root_cache_path);
 	TRANS_SETTING_STR(user_data_path);
 	TRANS_SETTING_STR(user_agent);
-	TRANS_SETTING_STR(product_version);
 	TRANS_SETTING_STR(locale);
 	TRANS_SETTING_STR(log_file);
 	TRANS_SETTING_STR(javascript_flags);
 	TRANS_SETTING_STR(resources_dir_path);
 	TRANS_SETTING_STR(locales_dir_path);
 	TRANS_SETTING_STR(accept_language_list);
-	TRANS_SETTING_STR(application_client_id_for_file_scanning);
 
 	TRANS_SETTING(no_sandbox);
 	TRANS_SETTING(chrome_runtime);
@@ -485,14 +463,13 @@ ACF_EXPORTS(Initialize, BOOL)(PACF_BASIC_INFO lpBasicInfo, LPVOID lpAppEvents, B
 	TRANS_SETTING(pack_loading_disabled);
 	TRANS_SETTING(remote_debugging_port);
 	TRANS_SETTING(uncaught_exception_stack_size);
-	TRANS_SETTING(ignore_certificate_errors);
 	TRANS_SETTING(background_color);
 	basic_info.log_severity = (cef_log_severity_t)lpBasicInfo->log_severity;
 
 #undef TRANS_SETTINGS_STR
 #undef TRANS_SETTINGS
 
-	return CefInitialize(main_args, basic_info, lpObjApp.get(), NULL);
+	return CefInitialize(main_args, basic_info, lpObjApp, NULL);
 }
 
 ACF_EXPORTS(CreateClient, LPVOID)(LPVOID lpClientEvents, BOOL copyData)
@@ -518,7 +495,7 @@ ACF_EXPORTS(CreateBrowser, BOOL)(ACFlibClient* lpObjClient, DWORD* window_info, 
 
 ACF_EXPORTS(CreateBrowserSync, void)(ACFlibClient* lpObjClient, DWORD* window_info, LPWSTR url, DWORD* browser_settings, CefDictionaryValue* extra_info, CefRequestContext* context, DWORD* pRetVal)
 {
-	CefRefPtr<CefBrowser> lpObjBrowser = NULL;
+	CefRefPtr<CefBrowser> lpObjBrowser = nullptr;
 	auto pInfo = reinterpret_cast<CefWindowInfo*>(window_info[1]);
 	auto settings = reinterpret_cast<CefBrowserSettings*>(browser_settings[1]);
 
@@ -526,22 +503,30 @@ ACF_EXPORTS(CreateBrowserSync, void)(ACFlibClient* lpObjClient, DWORD* window_in
 	if (lpObjBrowser)
 	{
 		lpObjBrowser->AddRef();
-		pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser);
+		pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser.get());
 		pRetVal[2] = (DWORD)acf_browser_funcs;
 	}
+}
+
+ACF_EXPORTS(CloseAllBrowsers, void)(ACFlibClient* lpObjClient)
+{
+	if (!lpObjClient)
+		return;
+
+	lpObjClient->CloseAllBrowsers();
 }
 
 ACF_EXPORTS(GetBrowserObject, void)(ACFlibClient* lpObjClient, HWND hWnd, DWORD* pRetVal)
 {
 	if (pRetVal == NULL) return;
-	CefRefPtr<CefBrowser> lpObjBrowser = NULL;
+	CefRefPtr<CefBrowser> lpObjBrowser = nullptr;
 	if (lpObjClient != NULL)
 	{
 		lpObjBrowser = lpObjClient->GetBrowserObject(hWnd);
 		if (lpObjBrowser != NULL)
 		{
 			lpObjBrowser->AddRef();
-			pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser);
+			pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser.get());
 			pRetVal[2] = (DWORD)acf_browser_funcs;
 		}
 	}
@@ -550,14 +535,14 @@ ACF_EXPORTS(GetBrowserObject, void)(ACFlibClient* lpObjClient, HWND hWnd, DWORD*
 ACF_EXPORTS(GetBrowserObjectAt, void)(ACFlibClient* lpObjClient, int index, DWORD* pRetVal)
 {
 	if (pRetVal == NULL) return;
-	CefRefPtr<CefBrowser> lpObjBrowser = NULL;
+	CefRefPtr<CefBrowser> lpObjBrowser = nullptr;
 	if (lpObjClient != NULL)
 	{
 		lpObjBrowser = lpObjClient->GetBrowserObjectAt(index);
 		if (lpObjBrowser != NULL)
 		{
 			lpObjBrowser->AddRef();
-			pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser);
+			pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser.get());
 			pRetVal[2] = (DWORD)acf_browser_funcs;
 		}
 	}
@@ -566,14 +551,14 @@ ACF_EXPORTS(GetBrowserObjectAt, void)(ACFlibClient* lpObjClient, int index, DWOR
 ACF_EXPORTS(GetBrowserObjectId, void)(ACFlibClient* lpObjClient, int identity, DWORD* pRetVal)
 {
 	if (pRetVal == NULL) return;
-	CefRefPtr<CefBrowser> lpObjBrowser = NULL;
+	CefRefPtr<CefBrowser> lpObjBrowser = nullptr;
 	if (lpObjClient != NULL)
 	{
 		lpObjBrowser = lpObjClient->GetBrowserObjectId(identity);
 		if (lpObjBrowser != NULL)
 		{
 			lpObjBrowser->AddRef();
-			pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser);
+			pRetVal[1] = (DWORD)((LPVOID)lpObjBrowser.get());
 			pRetVal[2] = (DWORD)acf_browser_funcs;
 		}
 	}
@@ -626,39 +611,24 @@ ACF_EXPORTS(SetBrowserSettingsState, void)(LPVOID object, int index, cef_state_t
 		settings->javascript_dom_paste = value;
 		break;
 	case 5:
-		settings->plugins = value;
-		break;
-	case 6:
-		settings->universal_access_from_file_urls = value;
-		break;
-	case 7:
-		settings->file_access_from_file_urls = value;
-		break;
-	case 8:
-		settings->web_security = value;
-		break;
-	case 9:
 		settings->image_loading = value;
 		break;
-	case 10:
+	case 6:
 		settings->image_shrink_standalone_to_fit = value;
 		break;
-	case 11:
+	case 7:
 		settings->text_area_resize = value;
 		break;
-	case 12:
+	case 8:
 		settings->tab_to_links = value;
 		break;
-	case 13:
+	case 9:
 		settings->local_storage = value;
 		break;
-	case 14:
+	case 10:
 		settings->databases = value;
 		break;
-	case 15:
-		settings->application_cache = value;
-		break;
-	case 16:
+	case 11:
 		settings->webgl = value;
 		break;
 	default:
@@ -728,11 +698,11 @@ ACF_EXPORTS(SetBrowserSettingsInt, void)(LPVOID object, int index, int value) {
 
 ACF_EXPORTS(SetWindowInfoChild, void)(LPVOID object, HWND parent, int x, int y, int nWidth, int nHeight) {
 	CefWindowInfo* info = reinterpret_cast<CefWindowInfo*>(object);
-	RECT rc;
-	rc.left = x;
-	rc.top = y;
-	rc.right = x + nWidth;
-	rc.bottom = y + nHeight;
+	CefRect rc;
+	rc.x = x;
+	rc.y = y;
+	rc.width = nWidth;
+	rc.height = nHeight;
 	info->SetAsChild(parent, rc);
 }
 
@@ -756,10 +726,10 @@ ACF_EXPORTS(SetWindowInfoStruct, void)(LPVOID object, PACF_WINDOWINFO pInfo) {
 		info->ex_style = pInfo->ex_style;
 	if (pInfo->style >= 0)
 		info->style = pInfo->style;
-	info->x = pInfo->x;
-	info->y = pInfo->y;
-	info->width = pInfo->width;
-	info->height = pInfo->height;
+	info->bounds.x = pInfo->x;
+	info->bounds.y = pInfo->y;
+	info->bounds.width = pInfo->width;
+	info->bounds.height = pInfo->height;
 	info->parent_window = (HWND)pInfo->parent_window;
 	info->menu = (HMENU)pInfo->menu;
 	info->window = (HWND)pInfo->window;
@@ -797,11 +767,6 @@ ACF_EXPORTS(Shutdown, void)()
 ACF_EXPORTS(SetOSModalLoop, void)(bool modal)
 {
 	CefSetOSModalLoop(modal);
-}
-
-ACF_EXPORTS(RegisterWidevineCdm, void)(LPWSTR path)
-{
-	CefRegisterWidevineCdm(path, NULL);
 }
 
 void OnControlKeyDown(LPVOID lpfnCallback, WPARAM wParam, LPARAM lParam)
@@ -989,5 +954,17 @@ ACF_EXPORTS(PostTask, void)(CefThreadId tid, LPFN_POST_TASK func, int lParam1, i
 ACF_EXPORTS(PostDelayedTask, void)(CefThreadId tid, LPFN_POST_TASK func, int64 ms, int lParam1, int lParam2, int lParam3)
 {
 	CefRefPtr<ACFlibTask> pTask = new ACFlibTask(func, lParam1, lParam2, lParam3);
+	CefPostDelayedTask(tid, pTask, ms);
+}
+
+ACF_EXPORTS(PostTaskStd, void)(CefThreadId tid, LPVOID callback, bool copy)
+{
+	CefRefPtr<ACFlibTaskStd> pTask = new ACFlibTaskStd(callback, copy);
+	CefPostTask(tid, pTask);
+}
+
+ACF_EXPORTS(PostDelayedTaskStd, void)(CefThreadId tid, int64 ms, LPVOID callback, bool copy)
+{
+	CefRefPtr<ACFlibTaskStd> pTask = new ACFlibTaskStd(callback, copy);
 	CefPostDelayedTask(tid, pTask, ms);
 }

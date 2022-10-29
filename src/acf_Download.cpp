@@ -74,7 +74,7 @@ BOOL ECALL download_get_start_time(CefDownloadItem* obj, cef_time_t** time_)
 {
 	ISVALIDR(obj, NULL);
 
-	**time_ = obj->GetStartTime();
+	cef_time_from_basetime(obj->GetStartTime(), *time_);
 
 	return time_ != NULL;
 }
@@ -83,7 +83,7 @@ BOOL ECALL download_get_end_time(CefDownloadItem* obj, cef_time_t** time_)
 {
 	ISVALIDR(obj, NULL);
 
-	**time_ = obj->GetEndTime();
+	cef_time_from_basetime(obj->GetEndTime(), *time_);
 
 	return time_ != NULL;
 }

@@ -223,7 +223,7 @@ BOOL ECALL param_is_pepper_menu(CefContextMenuParams* obj)
 {
 	ISVALIDR(obj, FALSE);
 
-	return obj->IsPepperMenu();
+	return false;
 }
 
 DWORD acf_menu_params_funcs[] = {
@@ -306,7 +306,7 @@ bool ECALL model_add_sub_item(CefMenuModel* obj, int command_id, LPCWSTR label, 
 	CefRefPtr<CefMenuModel> pSubMenu = obj->AddSubMenu(command_id, label);
 
 	pSubMenu->AddRef();
-	target[1] = (DWORD)((LPVOID)pSubMenu);
+	target[1] = (DWORD)((LPVOID)pSubMenu.get());
 	target[2] = (DWORD)acf_menu_model_funcs;
 
 	return !!pSubMenu;
@@ -347,7 +347,7 @@ bool ECALL model_insert_sub_item_at(CefMenuModel* obj, int index, int command_id
 	CefRefPtr<CefMenuModel> pSubMenu = obj->InsertSubMenuAt(index, command_id, label);
 
 	pSubMenu->AddRef();
-	target[1] = (DWORD)((LPVOID)pSubMenu);
+	target[1] = (DWORD)((LPVOID)pSubMenu.get());
 	target[2] = (DWORD)acf_menu_model_funcs;
 
 	return !!pSubMenu;
@@ -473,7 +473,7 @@ bool ECALL model_get_sub_menu(CefMenuModel* obj, int command_id, DWORD* target)
 	CefRefPtr<CefMenuModel> pSubMenu = obj->GetSubMenu(command_id);
 
 	pSubMenu->AddRef();
-	target[1] = (DWORD)((LPVOID)pSubMenu);
+	target[1] = (DWORD)((LPVOID)pSubMenu.get());
 	target[2] = (DWORD)acf_menu_model_funcs;
 
 	return !!pSubMenu;
@@ -486,7 +486,7 @@ bool ECALL model_get_sub_menu_at(CefMenuModel* obj, int index, DWORD* target)
 	CefRefPtr<CefMenuModel> pSubMenu = obj->GetSubMenuAt(index);
 
 	pSubMenu->AddRef();
-	target[1] = (DWORD)((LPVOID)pSubMenu);
+	target[1] = (DWORD)((LPVOID)pSubMenu.get());
 	target[2] = (DWORD)acf_menu_model_funcs;
 
 	return !!pSubMenu;

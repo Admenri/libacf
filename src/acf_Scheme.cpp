@@ -50,7 +50,7 @@ DWORD acf_callback[] = {
 
 ACF_EXPORTS(RegisterSchemeHandlerFactory, BOOL)(LPWSTR scheme, LPWSTR domain, LPVOID callback, BOOL copyData)
 {
-    CefRefPtr<ACFlibSchemeHandler> lpHandler = new ACFlibSchemeHandler(callback, copyData);
+    CefRefPtr<ACFlibSchemeHandler> lpHandler = callback ? new ACFlibSchemeHandler(callback, copyData) : nullptr;
 	
     return CefRegisterSchemeHandlerFactory(scheme, domain, lpHandler);
 }
@@ -69,9 +69,9 @@ CefRefPtr<CefResourceHandler> ACFlibSchemeHandler::Create(
 	{
 		LPVOID pClass = this->m_callback;
 
-		IMP_NEWECLASS(TempBrowser, browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempRequest, request, eClass::m_pVfRequestTable, acf_request_funcs);
+		IMP_NEWECLASS(TempBrowser, browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempRequest, request.get(), eClass::m_pVfRequestTable, acf_request_funcs);
 
 		USES_CONVERSION;
 
@@ -128,10 +128,10 @@ bool ACFlibSchemeHandler::Open(CefRefPtr<CefRequest> request,
 
 		USES_CONVERSION;
 
-		IMP_NEWECLASS(TempBrowser, m_browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, m_frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempRequest, request, eClass::m_pVfRequestTable, acf_request_funcs);
-		IMP_NEWECLASS(TempCallback, callback, eClass::m_pVfCallback, acf_callback);
+		IMP_NEWECLASS(TempBrowser, m_browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, m_frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempRequest, request.get(), eClass::m_pVfRequestTable, acf_request_funcs);
+		IMP_NEWECLASS(TempCallback, callback.get(), eClass::m_pVfCallback, acf_callback);
 
 		BOOL pHandle_request = NULL;
 
@@ -184,9 +184,9 @@ void ACFlibSchemeHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 
 		USES_CONVERSION;
 
-		IMP_NEWECLASS(TempBrowser, m_browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, m_frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempResponse, response, eClass::m_pVfResponseTable, acf_response_funcs);
+		IMP_NEWECLASS(TempBrowser, m_browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, m_frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempResponse, response.get(), eClass::m_pVfResponseTable, acf_response_funcs);
 
 		LPSTR pUrl = new char[4096];
 		ZeroMemory(pUrl, 4096);
@@ -194,6 +194,9 @@ void ACFlibSchemeHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 		int64 pLength = NULL;
 		LPVOID lpLength = &pLength;
 
+		m_browser->AddRef();
+		m_frame->AddRef();
+		response->AddRef();
 		__asm {
 			push ecx;
 			push ebx;
@@ -214,6 +217,9 @@ void ACFlibSchemeHandler::GetResponseHeaders(CefRefPtr<CefResponse> response,
 			pop ebx;
 			pop ecx;
 		}
+		m_browser->Release();
+		m_frame->Release();
+		response->Release();
 
 		if (*pUrl != '\0')
 			redirectUrl = CefString(pUrl);
@@ -231,9 +237,9 @@ bool ACFlibSchemeHandler::Skip(int64 bytes_to_skip,
 
 		USES_CONVERSION;
 
-		IMP_NEWECLASS(TempBrowser, m_browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, m_frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempCallback, callback, eClass::m_pVfCallbackResourceSkip, acf_callback_resource_skip);
+		IMP_NEWECLASS(TempBrowser, m_browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, m_frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempCallback, callback.get(), eClass::m_pVfCallbackResourceSkip, acf_callback_resource_skip);
 
 		char* pLoingValue = (char*)&bytes_to_skip;
 		DWORD dwValue1 = *(DWORD*)&pLoingValue[0];
@@ -289,9 +295,9 @@ bool ACFlibSchemeHandler::Read(void* data_out,
 
 		USES_CONVERSION;
 
-		IMP_NEWECLASS(TempBrowser, m_browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, m_frame, eClass::m_pVfFrameTable, acf_frame_funcs);
-		IMP_NEWECLASS(TempCallback, callback, eClass::m_pVfCallbackResourceRead, acf_callback_resource_read);
+		IMP_NEWECLASS(TempBrowser, m_browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, m_frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempCallback, callback.get(), eClass::m_pVfCallbackResourceRead, acf_callback_resource_read);
 
 		int pLength = NULL;
 		LPVOID lpLength = &pLength;
@@ -340,8 +346,8 @@ void ACFlibSchemeHandler::Cancel()
 
 		USES_CONVERSION;
 
-		IMP_NEWECLASS(TempBrowser, m_browser, eClass::m_pVfBrowserTable, acf_browser_funcs);
-		IMP_NEWECLASS(TempFrame, m_frame, eClass::m_pVfFrameTable, acf_frame_funcs);
+		IMP_NEWECLASS(TempBrowser, m_browser.get(), eClass::m_pVfBrowserTable, acf_browser_funcs);
+		IMP_NEWECLASS(TempFrame, m_frame.get(), eClass::m_pVfFrameTable, acf_frame_funcs);
 
 		m_browser->AddRef();
 		m_frame->AddRef();

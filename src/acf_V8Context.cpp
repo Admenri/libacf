@@ -83,7 +83,9 @@ ACF_EXPORTS(V8ValueCreateDouble, BOOL)(DWORD* target, double value)
 
 ACF_EXPORTS(V8ValueCreateDate, BOOL)(DWORD* target, cef_time_t* value)
 {
-	CefRefPtr<CefV8Value> lpObj = CefV8Value::CreateDate(*value);
+	cef_basetime_t time;
+	cef_time_to_basetime(value, &time);
+	CefRefPtr<CefV8Value> lpObj = CefV8Value::CreateDate(time);
 
 	lpObj->AddRef();
 	target[1] = (DWORD)((LPVOID)lpObj.get());
@@ -359,7 +361,7 @@ BOOL ECALL v8value_get_date_value(CefV8Value* obj, cef_time_t** time_)
 {
 	ISVALIDR(obj, NULL);
 
-	**time_ = obj->GetDateValue();
+	cef_time_from_basetime(obj->GetDateValue(), *time_);
 
 	return time_ != NULL;
 }
@@ -396,7 +398,7 @@ bool ECALL v8value_get_exception(CefV8Value* obj, DWORD* target)
 	CefRefPtr<CefV8Exception> pBrowser = obj->GetException();
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_v8_exception_funcs;
 
 	return !!pBrowser;
@@ -458,7 +460,7 @@ bool ECALL v8value_get_value(CefV8Value* obj, LPCWSTR key, DWORD* target)
 	CefRefPtr<CefV8Value> pBrowser = obj->GetValue(key);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_v8_value_funcs;
 
 	return !!pBrowser;
@@ -471,7 +473,7 @@ bool ECALL v8value_get_value_at(CefV8Value* obj, int index, DWORD* target)
 	CefRefPtr<CefV8Value> pBrowser = obj->GetValue(index);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_v8_value_funcs;
 
 	return !!pBrowser;
@@ -615,7 +617,7 @@ bool ECALL v8value_execute_function(CefV8Value* obj, CefV8Value* object, DWORD**
 	CefRefPtr<CefV8Value> pBrowser = obj->ExecuteFunction(object, pArgs);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_v8_value_funcs;
 
 	return !!pBrowser;
@@ -639,7 +641,7 @@ bool ECALL v8value_execute_function_with_context(CefV8Value* obj, CefV8Context* 
 	CefRefPtr<CefV8Value> pBrowser = obj->ExecuteFunctionWithContext(context, object, pArgs);
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_v8_value_funcs;
 
 	return !!pBrowser;
@@ -724,7 +726,7 @@ bool ECALL context_get_taskrunner(CefV8Context* obj, DWORD* target)
 	CefRefPtr<CefTaskRunner> pBrowser = obj->GetTaskRunner();
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_taskrunner_funcs;
 
 	return !!pBrowser;
@@ -744,7 +746,7 @@ bool ECALL context_get_browser(CefV8Context* obj, DWORD* target)
 	CefRefPtr<CefBrowser> pBrowser = obj->GetBrowser();
 
 	pBrowser->AddRef();
-	target[1] = (DWORD)((LPVOID)pBrowser);
+	target[1] = (DWORD)((LPVOID)pBrowser.get());
 	target[2] = (DWORD)acf_browser_funcs;
 
 	return !!pBrowser;
@@ -757,7 +759,7 @@ bool ECALL context_get_frame(CefV8Context* obj, DWORD* target)
 	CefRefPtr<CefFrame> pFrame = obj->GetFrame();
 
 	pFrame->AddRef();
-	target[1] = (DWORD)((LPVOID)pFrame);
+	target[1] = (DWORD)((LPVOID)pFrame.get());
 	target[2] = (DWORD)acf_frame_funcs;
 
 	return !!pFrame;
@@ -770,7 +772,7 @@ bool ECALL context_get_global(CefV8Context* obj, DWORD* target)
 	CefRefPtr<CefV8Value> pFrame = obj->GetGlobal();
 
 	pFrame->AddRef();
-	target[1] = (DWORD)((LPVOID)pFrame);
+	target[1] = (DWORD)((LPVOID)pFrame.get());
 	target[2] = (DWORD)acf_v8_value_funcs;
 
 	return !!pFrame;
@@ -801,20 +803,20 @@ bool ECALL context_eval(CefV8Context* obj, LPCWSTR code, LPCWSTR url, int line, 
 {
 	ISVALIDR(obj, NULL);
 
-	CefRefPtr<CefV8Value> valRet = 0;
-	CefRefPtr<CefV8Exception> excRet = 0;
+	CefRefPtr<CefV8Value> valRet = nullptr;
+	CefRefPtr<CefV8Exception> excRet = nullptr;
 
 	BOOL bRetVal = obj->Eval(code, url, line, valRet, excRet);
 
 	if (valRet) {
 		valRet->AddRef();
-		value[1] = (DWORD)((LPVOID)valRet);
+		value[1] = (DWORD)((LPVOID)valRet.get());
 		value[2] = (DWORD)acf_v8_value_funcs;
 	}
 
 	if (excRet) {
 		excRet->AddRef();
-		exception[1] = (DWORD)((LPVOID)excRet);
+		exception[1] = (DWORD)((LPVOID)excRet.get());
 		exception[2] = (DWORD)acf_v8_exception_funcs;
 	}
 

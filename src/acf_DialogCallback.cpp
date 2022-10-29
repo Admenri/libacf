@@ -19,7 +19,7 @@ DWORD acf_callback_js_dialog[] = {
 	(DWORD)&jsdialog_continue,
 };
 
-void ECALL filedialog_continue(CefFileDialogCallback* obj, int filter, LPVOID* aryFilePaths)
+void ECALL filedialog_continue(CefFileDialogCallback* obj, LPVOID* aryFilePaths)
 {
 	ISVALID(obj);
 
@@ -34,7 +34,7 @@ void ECALL filedialog_continue(CefFileDialogCallback* obj, int filter, LPVOID* a
 		pArgs[i] = (LPWSTR)EStreamToUnicode((LPBYTE)((LPDWORD)(pArgsList + sizeof(INT) * 2))[i]);
 	}
 
-	obj->Continue(filter, pArgs);
+	obj->Continue(pArgs);
 }
 
 void ECALL filedialog_cancel(CefFileDialogCallback* obj)

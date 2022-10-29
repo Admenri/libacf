@@ -42,6 +42,10 @@ namespace eClass {
 	DWORD m_pVfStreamReaderTable;
 	DWORD m_pVfStreamWriterTable;
 	DWORD m_pVfServerTable;
+	DWORD m_pVfViewTable;
+	DWORD m_pVfWindowTable;
+	DWORD m_pVfPanelTable;
+	DWORD m_pVfBrowserViewTable;
 
 	DWORD m_pVfCallbackMenu;
 	DWORD m_pVfCallbackDownload;
@@ -57,6 +61,8 @@ namespace eClass {
 	DWORD m_pVfCallbackV8RetVal;
 	DWORD m_pVfCallbackOnPopup;
 	DWORD m_pVfCallbackExtensionResource;
+	DWORD m_pVfCallbackPermission;
+	DWORD m_pVfCallbackPermissionMedia;
 
 	DWORD m_infoTable;
 	DWORD m_settingsTable;
@@ -189,6 +195,19 @@ ACF_EXPORTS(NewClass, void)(DWORD **pNewClass, int nType)
 		case 10039:
 			eClass::m_pVfServerTable = dwVfptr;
 			break;
+		case 10040:
+			eClass::m_pVfViewTable = dwVfptr;
+			break;
+		case 10041:
+			eClass::m_pVfWindowTable = dwVfptr;
+			break;
+		case 10042:
+			eClass::m_pVfPanelTable = dwVfptr;
+			break;
+		case 10043:
+			eClass::m_pVfBrowserViewTable = dwVfptr;
+			break;
+
 
 		case 20000:
 			eClass::m_infoTable = dwVfptr;
@@ -196,6 +215,7 @@ ACF_EXPORTS(NewClass, void)(DWORD **pNewClass, int nType)
 		case 20001:
 			eClass::m_settingsTable = dwVfptr;
 			return;
+
 
 		case 30000:
 			eClass::m_pVfCallbackMenu = dwVfptr;
@@ -238,6 +258,12 @@ ACF_EXPORTS(NewClass, void)(DWORD **pNewClass, int nType)
 			break;
 		case 30013:
 			eClass::m_pVfCallbackExtensionResource = dwVfptr;
+			break;
+		case 30014:
+			eClass::m_pVfCallbackPermissionMedia = dwVfptr;
+			break;
+		case 30015:
+			eClass::m_pVfCallbackPermission = dwVfptr;
 			break;
 
 		default:

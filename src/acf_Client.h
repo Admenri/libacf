@@ -21,7 +21,8 @@ class ACFlibClient : public CefClient,
 	public CefCookieAccessFilter,
 	public CefFocusHandler,
 	public CefLockHandler,
-	public CefAudioHandler
+	public CefAudioHandler,
+	public CefPermissionHandler
 {
 	typedef std::list<CefRefPtr<CefBrowser>> BrowserListValue;
 
@@ -40,6 +41,7 @@ public:
 	CefRefPtr<CefBrowser> GetBrowserObjectAt(int index);
 	CefRefPtr<CefBrowser> GetBrowserObjectId(int identity);
 	BOOL IsUserBrowser(CefRefPtr<CefBrowser> browser);
+	void CloseAllBrowsers();
 
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE{ return this; }
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE { return this; }
@@ -56,6 +58,7 @@ public:
 	virtual CefRefPtr<CefFocusHandler> GetFocusHandler() OVERRIDE { return this; }
 	virtual CefRefPtr<CefLockHandler> GetLockHandler() OVERRIDE { return this; }
 	virtual CefRefPtr<CefAudioHandler> GetAudioHandler() OVERRIDE { return this; }
+	virtual CefRefPtr<CefPermissionHandler> GetPermissionHandler() OVERRIDE { return this; }
 
 private:
 
@@ -63,7 +66,7 @@ private:
 	BrowserListValue m_pListValue;
 	BOOL m_copyData;
 
-protected:
+public:
 
 	virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
@@ -78,7 +81,7 @@ protected:
 		CefRefPtr<CefDictionaryValue>& extra_info,
 		bool* no_javascript_access) OVERRIDE;
 
-	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser)  OVERRIDE;
+	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDictionaryValue> extra_info)  OVERRIDE;
 
 	virtual bool DoClose(CefRefPtr<CefBrowser> browser)  OVERRIDE;
 
@@ -182,9 +185,9 @@ protected:
 		const RectList& dirtyRects,
 		void* shared_handle)  OVERRIDE;
 
-	virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
+	virtual bool OnCursorChange(CefRefPtr<CefBrowser> browser,
 		CefCursorHandle cursor,
-		CursorType type,
+		cef_cursor_type_t type,
 		const CefCursorInfo& custom_cursor_info)  OVERRIDE;
 
 	virtual bool StartDragging(CefRefPtr<CefBrowser> browser,
@@ -264,7 +267,6 @@ protected:
 		const CefString& title,
 		const CefString& default_file_path,
 		const std::vector<CefString>& accept_filters,
-		int selected_accept_filter,
 		CefRefPtr<CefFileDialogCallback> callback)  OVERRIDE;
 
 	virtual bool OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
@@ -309,13 +311,13 @@ protected:
 	virtual bool OnQuotaRequest(CefRefPtr<CefBrowser> browser,
 		const CefString& origin_url,
 		int64 new_size,
-		CefRefPtr<CefRequestCallback> callback)  OVERRIDE;
+		CefRefPtr<CefCallback> callback)  OVERRIDE;
 
 	virtual bool OnCertificateError(CefRefPtr<CefBrowser> browser,
 		cef_errorcode_t cert_error,
 		const CefString& request_url,
 		CefRefPtr<CefSSLInfo> ssl_info,
-		CefRefPtr<CefRequestCallback> callback)  OVERRIDE;
+		CefRefPtr<CefCallback> callback)  OVERRIDE;
 
 	virtual bool OnSelectClientCertificate(
 		CefRefPtr<CefBrowser> browser,
@@ -324,9 +326,6 @@ protected:
 		int port,
 		const X509CertificateList& certificates,
 		CefRefPtr<CefSelectClientCertificateCallback> callback)  OVERRIDE;
-
-	virtual void OnPluginCrashed(CefRefPtr<CefBrowser> browser,
-		const CefString& plugin_path)  OVERRIDE;
 
 	virtual void OnRenderViewReady(CefRefPtr<CefBrowser> browser)  OVERRIDE;
 
@@ -344,7 +343,7 @@ protected:
 		CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
 		CefRefPtr<CefRequest> request,
-		CefRefPtr<CefRequestCallback> callback)  OVERRIDE;
+		CefRefPtr<CefCallback> callback)  OVERRIDE;
 
 	virtual CefRefPtr<CefResourceHandler> GetResourceHandler(
 		CefRefPtr<CefBrowser> browser,
@@ -397,9 +396,9 @@ protected:
 
 	virtual void OnGotFocus(CefRefPtr<CefBrowser> browser)  OVERRIDE;
 
-	virtual bool OnMouseLockRequest(CefRefPtr<CefBrowser> browser, bool is_lost)  OVERRIDE;
+	virtual void OnMouseLockRequest(CefRefPtr<CefBrowser> browser, bool is_lost)  OVERRIDE;
 
-	virtual bool OnKeyboardLockRequest(CefRefPtr<CefBrowser> browser, bool is_lost)  OVERRIDE;
+	virtual void OnKeyboardLockRequest(CefRefPtr<CefBrowser> browser, bool is_lost)  OVERRIDE;
 
 	virtual bool GetAudioParameters(CefRefPtr<CefBrowser> browser,
 		CefAudioParameters& params)  OVERRIDE;
@@ -420,6 +419,25 @@ protected:
 
 	virtual void OnAudioStateChange(CefRefPtr<CefBrowser> browser,
 		bool audible)  OVERRIDE;
+
+	virtual bool OnRequestMediaAccessPermission(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefFrame> frame,
+		const CefString& requesting_origin,
+		uint32 requested_permissions,
+		CefRefPtr<CefMediaAccessCallback> callback) OVERRIDE;
+
+	virtual bool OnShowPermissionPrompt(
+		CefRefPtr<CefBrowser> browser,
+		uint64 prompt_id,
+		const CefString& requesting_origin,
+		uint32 requested_permissions,
+		CefRefPtr<CefPermissionPromptCallback> callback) OVERRIDE;
+
+	virtual void OnDismissPermissionPrompt(
+		CefRefPtr<CefBrowser> browser,
+		uint64 prompt_id,
+		cef_permission_request_result_t result) OVERRIDE;
 
 protected:
 

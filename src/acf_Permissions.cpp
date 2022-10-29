@@ -1,21 +1,36 @@
 
 #include "acf_Types.h"
-#include "acf_FrameEvents.h"
 
-#ifdef ACF_EXVER
+#include "include/cef_permission_handler.h"
 
-#include "include/cef_permission.h"
+extern DWORD acf_callback_permissionmedia[];
+extern DWORD acf_callback_permission[];
 
-ACF_EXPORTS(RegisterPermissionHandler, BOOL)(LPVOID lpCallback, BOOL copyData)
+void ECALL permissioncb_continue_media(CefMediaAccessCallback* obj, uint32 options)
 {
-	CefRefPtr<ACFlibPermissionHandler> lpHandler = new ACFlibPermissionHandler(lpCallback, copyData);
+  ISVALID(obj);
 
-	return CefRegisterPermissionHandler(lpHandler);
+  obj->Continue(options);
 }
 
-ACF_EXPORTS(ClearPermissionHandler, BOOL)()
+void ECALL permissioncb_cancel_media(CefMediaAccessCallback* obj)
 {
-	return CefClearPermissionHandler();
+  ISVALID(obj);
+
+  obj->Cancel();
 }
 
-#endif
+DWORD acf_callback_permissionmedia[] = {
+  (DWORD)&permissioncb_continue_media,
+  (DWORD)&permissioncb_cancel_media,
+};
+
+void ECALL permissioncb_continue(CefPermissionPromptCallback* callback, cef_permission_request_result_t result)
+{
+  ISVALID(callback);
+  callback->Continue(result);
+}
+
+DWORD acf_callback_permission[] = {
+  (DWORD)&permissioncb_continue,
+};

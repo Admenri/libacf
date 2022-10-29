@@ -5,17 +5,17 @@
 #include "include/cef_scheme.h"
 
 class ACFlibSchemeHandler : public CefSchemeHandlerFactory,
-	public CefResourceHandler
+  public CefResourceHandler
 {
 public:
-	ACFlibSchemeHandler(LPVOID lpCallback, BOOL copyData);
-	~ACFlibSchemeHandler();
+  ACFlibSchemeHandler(LPVOID lpCallback, BOOL copyData);
+  ~ACFlibSchemeHandler();
 
-    void SetBuffer(void* inputBuffer, size_t length);
+  void SetBuffer(void* inputBuffer, size_t length);
 
 private:
 
-	LPVOID m_callback;
+    LPVOID m_callback;
     CefRefPtr<CefBrowser> m_browser;
     CefRefPtr<CefFrame> m_frame;
     size_t m_totalBytes;
@@ -26,11 +26,11 @@ private:
 
 protected:
 
-	virtual CefRefPtr<CefResourceHandler> Create(
-		CefRefPtr<CefBrowser> browser,
-		CefRefPtr<CefFrame> frame,
-		const CefString& scheme_name,
-		CefRefPtr<CefRequest> request)  OVERRIDE;
+  virtual CefRefPtr<CefResourceHandler> Create(
+    CefRefPtr<CefBrowser> browser,
+    CefRefPtr<CefFrame> frame,
+    const CefString& scheme_name,
+    CefRefPtr<CefRequest> request)  OVERRIDE;
 
     virtual bool Open(CefRefPtr<CefRequest> request,
         bool& handle_request,
@@ -51,5 +51,5 @@ protected:
 
     virtual void Cancel()  OVERRIDE;
 
-	IMPLEMENT_REFCOUNTING(ACFlibSchemeHandler);
+  IMPLEMENT_REFCOUNTING(ACFlibSchemeHandler);
 };

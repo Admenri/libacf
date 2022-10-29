@@ -7,6 +7,7 @@
 extern DWORD acf_browser_funcs[];
 extern DWORD acf_browser_host_funcs[];
 extern DWORD acf_frame_funcs[];
+extern DWORD acf_dictionary_funcs[];
 
 bool ECALL browser_get_host(CefBrowser* obj, DWORD* target)
 {
@@ -215,13 +216,18 @@ bool ECALL browser_get_frame_names(CefBrowser* obj, LPVOID* eArray)
 	return 0;
 }
 
-void ECALL browser_set_touch_event_emulattion_enabled(CefBrowser* obj, bool enabled, int touch_points)
+bool ECALL browser_get_extra_info(CefBrowser* obj, DWORD* target)
 {
-	ISVALID(obj);
+	ISVALIDR(obj, false);
 
-#ifdef ACF_EXVER
-	obj->SetTouchEventEmulationEnabled(enabled, touch_points);
-#endif
+	CefRefPtr<CefDictionaryValue> lpFrame = obj->GetExtraInfo();
+
+	if (lpFrame)
+		lpFrame->AddRef();
+	target[1] = (DWORD)((LPVOID)lpFrame.get());
+	target[2] = (DWORD)acf_dictionary_funcs;
+
+	return lpFrame != NULL;
 }
 
 DWORD acf_browser_funcs[] = {
@@ -245,5 +251,5 @@ DWORD acf_browser_funcs[] = {
 	(DWORD)&browser_get_frame_count,
 	(DWORD)&browser_get_frame_identifiers,
 	(DWORD)&browser_get_frame_names,
-	(DWORD)&browser_set_touch_event_emulattion_enabled,
+	(DWORD)&browser_get_extra_info,
 };

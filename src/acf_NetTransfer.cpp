@@ -420,7 +420,7 @@ DWORD ECALL urlrequest_get_client(CefURLRequest* obj)
 {
 	ISVALIDR(obj, false);
 
-	return (DWORD)(LPVOID)obj->GetClient();
+	return (DWORD)(LPVOID)obj->GetClient().get();
 }
 
 int ECALL urlrequest_get_request_status(CefURLRequest* obj)

@@ -8,9 +8,9 @@
 #include "include/cef_base.h"
 #include "include/cef_version.h"
 
-ACF_EXPORTS(SetAdmenriProductKey, BOOL)(LPSTR key);
+ACF_EXPORTS(Version, const char*)(void) { return "Admenri Cef Framework 2.0 | Admenri Copyright (C) 2022"; }
 
-ACF_EXPORTS(Version, const char*)(void) { return "Admenri Cef Framework | Admenri Copyright (C) 2021"; }
+ACF_EXPORTS(SetGoogleAPIInfo, void)(int type, const char* value);
 
 ACF_EXPORTS(ExecuteProcess, int)(LPVOID lpAppEvents, BOOL copyData);
 
@@ -23,6 +23,8 @@ ACF_EXPORTS(ReleaseClient, void)(ACFlibClient* lpObjClient);
 ACF_EXPORTS(CreateBrowser, BOOL)(ACFlibClient* lpObjClient, DWORD* window_info, LPWSTR url, DWORD* browser_settings, CefDictionaryValue* extra_info, CefRequestContext* context);
 
 ACF_EXPORTS(CreateBrowserSync, void)(ACFlibClient* lpObjClient, DWORD* window_info, LPWSTR url, DWORD* browser_settings, CefDictionaryValue* extra_info, CefRequestContext* context, DWORD* pRetVal);
+
+ACF_EXPORTS(CloseAllBrowsers, void)(ACFlibClient* lpObjClient);
 
 ACF_EXPORTS(GetBrowserObject, void)(ACFlibClient* lpObjClient, HWND hWnd, DWORD* pRetVal);
 
@@ -68,14 +70,14 @@ ACF_EXPORTS(Shutdown, void)();
 
 ACF_EXPORTS(AddRef, void)(LPVOID object, int nType);
 
-ACF_EXPORTS(Release, void)(LPVOID object,int nType);
-
-ACF_EXPORTS(RegisterWidevineCdm, void)(LPWSTR path);
+ACF_EXPORTS(Release, void)(LPVOID object, int nType);
 
 ACF_EXPORTS(AddEvents, void)(HWND hWnd, WINDOW_EVENT_TYPE nType, LPVOID lpfnEventCallback);
 
 ACF_EXPORTS(CurrentlyOn, BOOL)(CefThreadId tid);
 
 ACF_EXPORTS(PostTask, void)(CefThreadId tid, LPFN_POST_TASK func, int lParam1, int lParam2, int lParam3);
-
 ACF_EXPORTS(PostDelayedTask, void)(CefThreadId tid, LPFN_POST_TASK func, int64 ms, int lParam1, int lParam2, int lParam3);
+
+ACF_EXPORTS(PostTaskStd, void)(CefThreadId tid, LPVOID callback, bool copy);
+ACF_EXPORTS(PostDelayedTaskStd, void)(CefThreadId tid, int64 ms, LPVOID callback, bool copy);

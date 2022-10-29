@@ -33,6 +33,9 @@ protected:
 		const CefString& process_type,
 		CefRefPtr<CefCommandLine> command_line) OVERRIDE;
 
+	virtual void OnRegisterCustomSchemes(
+		CefRawPtr<CefSchemeRegistrar> registrar) OVERRIDE;
+
 	virtual void OnContextInitialized() OVERRIDE;
 
 	virtual void OnBeforeChildProcessLaunch(
@@ -71,6 +74,8 @@ protected:
 		CefRefPtr<CefFrame> frame,
 		CefProcessId source_process,
 		CefRefPtr<CefProcessMessage> message)  OVERRIDE;
+	
+	/*-----------------------------------------------------------------*/
 
 	virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 		bool isLoading,

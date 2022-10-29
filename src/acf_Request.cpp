@@ -15,14 +15,14 @@ extern DWORD acf_url_request_funcs[];
 extern DWORD acf_callback_request[];
 extern DWORD acf_response_funcs[];
 
-void ECALL requestcallback_continue(CefRequestCallback* obj, bool allow)
+void ECALL requestcallback_continue(CefCallback* obj)
 {
 	ISVALID(obj);
 
-	obj->Continue(allow);
+	obj->Continue();
 }
 
-void ECALL requestcallback_cancel(CefRequestCallback* obj)
+void ECALL requestcallback_cancel(CefCallback* obj)
 {
 	ISVALID(obj);
 
@@ -139,7 +139,7 @@ bool ECALL request_get_post_data(CefRequest* obj, DWORD* target)
 	CefRefPtr<CefPostData> lpObj = obj->GetPostData();
 
 	lpObj->AddRef();
-	target[1] = (DWORD)((LPVOID)lpObj);
+	target[1] = (DWORD)((LPVOID)lpObj.get());
 	target[2] = (DWORD)acf_post_data_funcs;
 
 	return !!lpObj;

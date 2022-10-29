@@ -11,9 +11,13 @@
 #include "include/cef_urlrequest.h"
 #include "include/cef_server.h"
 
-#ifdef ACF_EXVER
-#include "include/cef_permission.h"
-#endif
+#include "include/views/cef_view.h"
+#include "include/views/cef_window.h"
+#include "include/views/cef_browser_view.h"
+
+#include "include/views/cef_window_delegate.h"
+#include "include/views/cef_browser_view_delegate.h"
+#include "include/views/cef_view_delegate.h"
 
 class ACFV8RetValCallback : public CefBaseRefCounted
 {
@@ -242,13 +246,6 @@ protected:
 	virtual void OnRequestContextInitialized(
 		CefRefPtr<CefRequestContext> request_context)  OVERRIDE;
 
-	virtual bool OnBeforePluginLoad(const CefString& mime_type,
-		const CefString& plugin_url,
-		bool is_main_frame,
-		const CefString& top_origin_url,
-		CefRefPtr<CefWebPluginInfo> plugin_info,
-		PluginPolicy* plugin_policy)  OVERRIDE;
-
 	virtual CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(
 		CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefFrame> frame,
@@ -333,7 +330,6 @@ private:
 protected:
 
 	virtual void OnFileDialogDismissed(
-		int selected_accept_filter,
 		const std::vector<CefString>& file_paths)  OVERRIDE;
 
 	IMPLEMENT_REFCOUNTING(ACFlibRunFileDialogCallback);
@@ -448,46 +444,6 @@ protected:
 
 	IMPLEMENT_REFCOUNTING(ACFlibDevToolsMessageObserver);
 };
-
-#ifdef ACF_EXVER
-
-class ACFlibPermissionHandler : public CefPermissionHandler
-{
-public:
-
-	ACFlibPermissionHandler(LPVOID lpCallback, BOOL copyData);
-	~ACFlibPermissionHandler();
-
-private:
-
-	LPVOID m_callback; BOOL m_copyData;
-
-protected:
-
-	virtual bool RequestPermission(
-		PermissionType permission,
-		bool user_gesture)  OVERRIDE;
-
-	virtual bool RequestPermissions(
-		PermissionType permission,
-		bool user_gesture,
-		int total,
-		int count)  OVERRIDE;
-
-	virtual void ResetPermission(
-		PermissionType permission,
-		const CefString& requesting_origin,
-		const CefString& embedding_origin)  OVERRIDE;
-
-	virtual bool GetPermissionStatus(
-		PermissionType permission,
-		const CefString& requesting_origin,
-		const CefString& embedding_origin)  OVERRIDE;
-
-	IMPLEMENT_REFCOUNTING(ACFlibPermissionHandler);
-};
-
-#endif
 
 class ACFlibNavigationEntryVisitor : public CefNavigationEntryVisitor
 {
@@ -606,4 +562,123 @@ protected:
 		size_t data_size)  OVERRIDE;
 
 	IMPLEMENT_REFCOUNTING(ACFlibServerHandler);
+};
+
+class ACFlibWindowDelegate : public CefWindowDelegate
+{
+public:
+	ACFlibWindowDelegate(LPVOID callback, bool copy) : m_callback(callback), m_copy(copy) {};
+	~ACFlibWindowDelegate();
+
+protected:
+	virtual void OnWindowCreated(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual void OnWindowDestroyed(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual void OnWindowActivationChanged(CefRefPtr<CefWindow> window,
+		bool active) OVERRIDE;
+
+	virtual CefRefPtr<CefWindow> GetParentWindow(CefRefPtr<CefWindow> window,
+		bool* is_menu,
+		bool* can_activate_menu) OVERRIDE;
+
+	virtual CefRect GetInitialBounds(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual cef_show_state_t GetInitialShowState(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual bool IsFrameless(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual bool CanResize(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual bool CanMaximize(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual bool CanMinimize(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual bool CanClose(CefRefPtr<CefWindow> window) OVERRIDE;
+
+	virtual bool OnAccelerator(CefRefPtr<CefWindow> window, int command_id) OVERRIDE;
+
+	virtual bool OnKeyEvent(CefRefPtr<CefWindow> window,
+		const CefKeyEvent& event) OVERRIDE;
+
+private:
+	LPVOID m_callback;
+	bool m_copy;
+
+protected:
+	IMPLEMENT_REFCOUNTING(ACFlibWindowDelegate);
+};
+
+class ACFlibPanelDelegate : public CefViewDelegate
+{
+public:
+	ACFlibPanelDelegate(LPVOID callback, bool copy) : m_callback(callback), m_copy(copy) {};
+	~ACFlibPanelDelegate();
+
+protected:
+	virtual CefSize GetPreferredSize(CefRefPtr<CefView> view) OVERRIDE;
+
+	virtual CefSize GetMinimumSize(CefRefPtr<CefView> view) OVERRIDE;
+
+	virtual CefSize GetMaximumSize(CefRefPtr<CefView> view) OVERRIDE;
+
+	virtual int GetHeightForWidth(CefRefPtr<CefView> view, int width) OVERRIDE;
+
+	virtual void OnParentViewChanged(CefRefPtr<CefView> view,
+		bool added,
+		CefRefPtr<CefView> parent) OVERRIDE;
+
+	virtual void OnChildViewChanged(CefRefPtr<CefView> view,
+		bool added,
+		CefRefPtr<CefView> child) OVERRIDE;
+
+	virtual void OnWindowChanged(CefRefPtr<CefView> view, bool added) OVERRIDE;
+
+	virtual void OnLayoutChanged(CefRefPtr<CefView> view,
+		const CefRect& new_bounds) OVERRIDE;
+
+	virtual void OnFocus(CefRefPtr<CefView> view) OVERRIDE;
+
+	virtual void OnBlur(CefRefPtr<CefView> view) OVERRIDE;
+
+private:
+	LPVOID m_callback;
+	bool m_copy;
+
+protected:
+	IMPLEMENT_REFCOUNTING(ACFlibPanelDelegate);
+};
+
+class ACFlibBrowserViewDelegate : public CefBrowserViewDelegate
+{
+public:
+	ACFlibBrowserViewDelegate(LPVOID callback, bool copy) : m_callback(callback), m_copy(copy) {};
+	~ACFlibBrowserViewDelegate();
+
+protected:
+	virtual void OnBrowserCreated(CefRefPtr<CefBrowserView> browser_view,
+		CefRefPtr<CefBrowser> browser) OVERRIDE;
+
+	virtual void OnBrowserDestroyed(CefRefPtr<CefBrowserView> browser_view,
+		CefRefPtr<CefBrowser> browser) OVERRIDE;
+
+	virtual CefRefPtr<CefBrowserViewDelegate> GetDelegateForPopupBrowserView(
+		CefRefPtr<CefBrowserView> browser_view,
+		const CefBrowserSettings& settings,
+		CefRefPtr<CefClient> client,
+		bool is_devtools) OVERRIDE;
+
+	virtual bool OnPopupBrowserViewCreated(
+		CefRefPtr<CefBrowserView> browser_view,
+		CefRefPtr<CefBrowserView> popup_browser_view,
+		bool is_devtools) OVERRIDE;
+
+	virtual ChromeToolbarType GetChromeToolbarType() OVERRIDE;
+
+private:
+	LPVOID m_callback;
+	bool m_copy;
+
+protected:
+	IMPLEMENT_REFCOUNTING(ACFlibBrowserViewDelegate);
 };
